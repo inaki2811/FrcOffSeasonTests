@@ -16,36 +16,86 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Velocity;
 
-
-/** Add your docs here. */
+/**
+ * Encapsula la configuración y el control de un módulo swerve:
+ * <ul>
+ *   <li>Motor de tracción operando con su control de velocidad</li>
+ *   <li>Motor de giro operando en modo MaxMotion con su posición suavizada</li>
+ * </ul>
+ *
+ * Esta clase:
+ * <ul>
+ *   <li>Aplica las ganancias PID y factores de conversión desde {@link SwerveConstants}</li>
+ *   <li>Aplica los offsets físicos al encoder absoluto internamente</li>
+ *   <li>Provee métodos seguros para establecer velocidad lineal y ángulo objetivo</li>
+ * </ul>
+ */
 public class SwerveController {
 
+    // --- Motores físicos ---
+
+    /** Motor de tracción del módulo */
     private final SparkMax driveMotor;
 
+    /** Motor de giro del módulo */
     private final SparkMax turningMotor;
 
+
+    // --- Controladores PID ---
+
+    /** Controlador del motor de tracción */
     private final SparkClosedLoopController drivePID;
 
+    /** Controlador del motor de giro */
     private final SparkClosedLoopController turningPID;
 
+
+    // --- Offset encoder absoluto---
+
+    private final double offSetRotationsRad;
+    
+
+
+    /** 
+    * Inicializa los controladores que estan vinculados al hardware físico de los módulos definifos en SwerveIO
+    * @param io El contenedor de hardware (motores y sensores) del móduo
+    */
     public SwerveController(SwerveIO io){
+        //Se extraen los motores del IO
         this.driveMotor = io.getDriveMotor();
         this.turningMotor = io.getTurningMotor();
+
+        this.offSetRotationsRad = io.getAbsoluteEncoderOffSetRad();
+
+        //Se extraen los controladores PID internos de la memoria del SparkMax
         this.drivePID = driveMotor.getClosedLoopController();
         this.turningPID = turningMotor.getClosedLoopController();
         
+        // Aplicamos las configuraciones a la memoria 
         configureDriveMotors();
+        configureTurningMotors();
     }
 
-
+    /**
+     * Configura los parámetros del motor de tracción
+     * Establece los límites de corriente, factores de conversión a metros y el PID de velocidad
+     */
     private void configureDriveMotors() {
         SparkMaxConfig driveConfig = new SparkMaxConfig();
 
-        driveConfig.idleMode(IdleMode.kBrake);
-        driveConfig.smartCurrentLimit(40);
-        driveConfig.voltageCompensation(12.0);
+        /**  Comportamiento físico y protección eléctrica */
+        driveConfig.idleMode(IdleMode.kBrake);  // Frena al recibir 0 en lugar de patinar
+        driveConfig.smartCurrentLimit(40);  // Establece el limite de corriente
+        driveConfig.voltageCompensation(12.0);  //Estandariza el comportamiento de la batería
+
+        /** Conversión de unidades: 
+         *  De: Unidades internas del motor
+         *  A: Metros 
+        */
         driveConfig.encoder.positionConversionFactor(SwerveConstants.ROT_2_M);
         driveConfig.encoder.velocityConversionFactor(SwerveConstants.ROT_2_M / 60);
+
+        /** Aplicacion de las unidades PID */
         driveConfig.closedLoop.pid(
             SwerveConstants.VEL_KP,
             SwerveConstants.VEL_KI,
@@ -53,39 +103,63 @@ public class SwerveController {
             );
         driveConfig.closedLoop.velocityFF(SwerveConstants.VEL_KV);
 
+        /** Guarda la configuración en la memoria del Spark y se protege reinicios bruscos */
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
 
+    /**
+     * Configura los parámetros del motor de giro
+     * Establece el uso de encoder absoluto, el Continous Wrapping y el perfil de movimiento MAXMotion
+     */
     private void configureTurningMotors() {
         SparkMaxConfig turningConfig = new SparkMaxConfig();
 
-        turningConfig.idleMode(IdleMode.kBrake);
-        turningConfig.smartCurrentLimit(40);
-        turningConfig.voltageCompensation(12.0);
-        turningConfig.absoluteEncoder.positionConversionFactor(2.0 * Math.PI);
+        /** Se convierte el offset de radianes a rotaciones (0 - 1) para el SparkMax */
+        double offSetRotations = offSetRotationsRad / (2.0 * Math.PI);
+
+        /**  Comportamiento físico y protección eléctrica */
+        turningConfig.idleMode(IdleMode.kBrake);    // Frena al recibir 0 en lugar de patinar
+        turningConfig.smartCurrentLimit(40);    // Establece el limite de corriente
+        turningConfig.voltageCompensation(12.0);    //Estandariza el comportamiento de la batería
+
+        // Configuración del encoder absoluto externo
+        turningConfig.absoluteEncoder.positionConversionFactor(2.0 * Math.PI);  // Salida en radianes
         turningConfig.absoluteEncoder.velocityConversionFactor((2.0 * Math.PI) / 60);
-        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        turningConfig.absoluteEncoder.zeroOffset(offSetRotations);  //Alineación del 0 físico
+
+        /** Aplicacion de las unidades PID */
         turningConfig.closedLoop.pid(
             SwerveConstants.POS_KP, 
             SwerveConstants.POS_KI, 
             SwerveConstants.POS_KD
             );
         turningConfig.closedLoop.velocityFF(SwerveConstants.POS_KV);
+
+        /** Le indica al PID leer los datos del encoder absoluto */
+        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);   
+
+        /** Position Wrapping: Optimiza y hace al módulo swerve ir por el camino más corto en un círculo (ej. de 359° a 1°) */
         turningConfig.closedLoop.positionWrappingEnabled(true);
         turningConfig.closedLoop.positionWrappingInputRange(0.0, 2.0 * Math.PI);
+
+        /** Perfil de movimiento MaxMotion: Suaviza la aceleración y limita la velocidad máxima */
         turningConfig.closedLoop.maxMotion.maxVelocity(SwerveConstants.MAGIC_MOTION_VELOCITY_STR);
         turningConfig.closedLoop.maxMotion.maxAcceleration(SwerveConstants.MAGIC_MOTION_ACCELERATION_STR);
 
-
+        /** Guarda la configuración en la memoria del Spark y se protege reinicios bruscos */
         turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-
+    /**
+     * Ordena el motor de tracción moverse a una velocidad específica
+     * @param velocityMps Velocidad deseada en Metros por Segundo
+     */
     public void setVelocity (double velocityMps) {
+        //  Deadband de velocidad: A partir de cierto umbral ignora comandos
         if (Math.abs(velocityMps) > 0.1) {
 
-            drivePID.setSetpoint(velocityMps, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot0, 0.0);
+            drivePID.setSetpoint(velocityMps, ControlType.kVelocity, ClosedLoopSlot.kSlot0, 0.0);
 
         } else {
 
@@ -94,17 +168,24 @@ public class SwerveController {
         }
     }
 
+    /**
+     * Ordena al motor de rotación establecerse en cierto ángulo ecpecífico
+     * @param angleRad Ángulo deseado en Radianes (Rango de 0 a 2π)
+     */
     public void setAngle ( double angleRad) {
         
-        double currentAngleRad = turningMotor.getAbsoluteEncoder().getPosition();
-        
+        // Lee posición actual del encoder absoluto
+        double currentAngleRad = turningMotor.getAbsoluteEncoder().getPosition();  
+
+        //  Deadband de rotación: Solo se moverá si el error es mayor a 1 grado (~0.017 rads)
         if(Math.abs(angleRad - currentAngleRad) > Math.toRadians(1)){
 
-            turningPID.setSetpoint(angleRad, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, angleRad);
+            //  Usa MAXMotion para un movimiento fluido y rápido
+            turningPID.setSetpoint(angleRad, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, 0.0);    
 
         } else {
 
-            driveMotor.stopMotor();
+            turningMotor.stopMotor(); 
 
         }
         
