@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
  *  <li> Motor de tracción (drive)  </li>
  *  <li> Motor de giro (turning)  </li>
  *  <li> Encoder relativo de tracción (driveEncoder)  </li>
- *  <li> Encoder absoluto de giro (turningEncoder)  </li>
+ *  <li> Encoder relativo de giro (turningEncoder)  </li>
  * </ul>
  * 
  * Esta clase se encarga de:
@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
  *  <li> Resetear el encoder de tracción   </li>
  *  <li> Proveer los getters de motores  </li>
  *  <li> Proveer los getters de encoders  </li>
- *  <li> Proveer el getters del OffSet del encoder absoluto  </li>
  * </ul>
  *  
  * */
@@ -38,19 +37,11 @@ public class SwerveIO {
     /** Motor encargado del giro del Swerve */
     private final SparkMax turningMotor;
 
-
     /** Encoder relativo del motor de tracción */
     private final RelativeEncoder driveEncoder;
 
-    /** Encoder absoluto del motor de giro */
-    private final AbsoluteEncoder turningAbsoluteEncoder;
-
-    /** OffSet del encoder absoluto en Radianes
-     *  <p>
-     *  Con esto alineas mecánicamente el 0 del módulo con el 0 del software
-     *  Si no se tiene medido aún, puedes dejarlo en 0 hasta que se mida
-     */
-    private final double absoluteEncoderOffSetRAD;
+    /** Encoder relativo del motor de giro */
+    private final RelativeEncoder turningEncoder;
 
     /**
      * 
@@ -58,26 +49,24 @@ public class SwerveIO {
      * 
      * @param driveSparkID
      * @param turningSparkID
-     * @param absoluteEncoderOffSetRAD
      */
     public SwerveIO(
             int driveSparkID,
-            int turningSparkID,
-            double absoluteEncoderOffSetRAD
+            int turningSparkID
     ) {
         this.driveMotor = new SparkMax(driveSparkID, MotorType.kBrushless);
         this.driveEncoder = driveMotor.getEncoder();
         this.turningMotor = new SparkMax(turningSparkID, MotorType.kBrushless);
-        this.turningAbsoluteEncoder = turningMotor.getAbsoluteEncoder();
-        this.absoluteEncoderOffSetRAD = absoluteEncoderOffSetRAD;
+        this.turningEncoder = turningMotor.getEncoder();
 
-        // Resetea motor de tracción
-        resetDriveEncoder();
+        // Resetea encoders
+        resetEncoders();
     }
 
-    //** Reinicia la posición del motor de tracción a 0 metros*/
-    public void resetDriveEncoder(){
+    //** Reinicia la posición de los motores a 0 metros*/
+    public void resetEncoders(){
         driveEncoder.setPosition(0.0);
+        turningEncoder.setPosition(0.0);
     }
     
     // --- Getters de Encoders para Odometría ---
@@ -95,10 +84,8 @@ public class SwerveIO {
     }
 
     /** @return El ángulo de la rueda en radianes */
-    public double getTurningAbsoluteEncoderRadians(){
-
-        return turningAbsoluteEncoder.getPosition();
-
+    public double getTurningEncoderRadians(){
+        return turningEncoder.getPosition();
     }
 
     // --- Getters de Hardware ---
@@ -111,10 +98,6 @@ public class SwerveIO {
         return turningMotor;
     }
 
-    /** @return El offset físico del módulo */
-    public double getAbsoluteEncoderOffSetRad(){
-        return absoluteEncoderOffSetRAD;
-    }
 }
 
 

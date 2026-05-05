@@ -26,7 +26,6 @@ import edu.wpi.first.units.measure.Velocity;
  * Esta clase:
  * <ul>
  *   <li>Aplica las ganancias PID y factores de conversión desde {@link SwerveConstants}</li>
- *   <li>Aplica los offsets físicos al encoder absoluto internamente</li>
  *   <li>Provee métodos seguros para establecer velocidad lineal y ángulo objetivo</li>
  * </ul>
  */
@@ -49,13 +48,6 @@ public class SwerveController {
     /** Controlador del motor de giro */
     private final SparkClosedLoopController turningPID;
 
-
-    // --- Offset encoder absoluto---
-
-    private final double offSetRotationsRad;
-    
-
-
     /** 
     * Inicializa los controladores que estan vinculados al hardware físico de los módulos definifos en SwerveIO
     * @param io El contenedor de hardware (motores y sensores) del móduo
@@ -64,8 +56,6 @@ public class SwerveController {
         //Se extraen los motores del IO
         this.driveMotor = io.getDriveMotor();
         this.turningMotor = io.getTurningMotor();
-
-        this.offSetRotationsRad = io.getAbsoluteEncoderOffSetRad();
 
         //Se extraen los controladores PID internos de la memoria del SparkMax
         this.drivePID = driveMotor.getClosedLoopController();
@@ -110,23 +100,22 @@ public class SwerveController {
 
     /**
      * Configura los parámetros del motor de giro
-     * Establece el uso de encoder absoluto, el Continous Wrapping y el perfil de movimiento MAXMotion
+     * Establece el uso de Wrapping y el perfil de movimiento MAXMotion
      */
     private void configureTurningMotors() {
         SparkMaxConfig turningConfig = new SparkMaxConfig();
 
-        /** Se convierte el offset de radianes a rotaciones (0 - 1) para el SparkMax */
-        double offSetRotations = offSetRotationsRad / (2.0 * Math.PI);
-
+        
         /**  Comportamiento físico y protección eléctrica */
         turningConfig.idleMode(IdleMode.kBrake);    // Frena al recibir 0 en lugar de patinar
         turningConfig.smartCurrentLimit(40);    // Establece el limite de corriente
         turningConfig.voltageCompensation(12.0);    //Estandariza el comportamiento de la batería
 
-        // Configuración del encoder absoluto externo
-        turningConfig.absoluteEncoder.positionConversionFactor(2.0 * Math.PI);  // Salida en radianes
-        turningConfig.absoluteEncoder.velocityConversionFactor((2.0 * Math.PI) / 60);
-        turningConfig.absoluteEncoder.zeroOffset(offSetRotations);  //Alineación del 0 físico
+        // Configuración del encoder
+                
+        turningConfig.encoder.positionConversionFactor(2.0 * Math.PI);  // Salida en radianes
+        turningConfig.encoder.velocityConversionFactor((2.0 * Math.PI) / 60);
+        
 
         /** Aplicacion de las unidades PID */
         turningConfig.closedLoop.pid(
@@ -136,8 +125,8 @@ public class SwerveController {
             );
         turningConfig.closedLoop.velocityFF(SwerveConstants.POS_KV);
 
-        /** Le indica al PID leer los datos del encoder absoluto */
-        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);   
+        /** Le indica al PID leer los datos del encoder */
+        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);   
 
         /** Position Wrapping: Optimiza y hace al módulo swerve ir por el camino más corto en un círculo (ej. de 359° a 1°) */
         turningConfig.closedLoop.positionWrappingEnabled(true);
@@ -174,8 +163,8 @@ public class SwerveController {
      */
     public void setAngle ( double angleRad) {
         
-        // Lee posición actual del encoder absoluto
-        double currentAngleRad = turningMotor.getAbsoluteEncoder().getPosition();  
+        // Lee posición actual del encoder 
+        double currentAngleRad = turningMotor.getEncoder().getPosition();  
 
         //  Deadband de rotación: Solo se moverá si el error es mayor a 1 grado (~0.017 rads)
         if(Math.abs(angleRad - currentAngleRad) > Math.toRadians(1)){
