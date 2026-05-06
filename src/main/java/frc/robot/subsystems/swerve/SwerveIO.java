@@ -68,6 +68,11 @@ public class SwerveIO {
         driveEncoder.setPosition(0.0);
         turningEncoder.setPosition(0.0);
     }
+
+    public void stop() {
+        driveMotor.stopMotor();
+        turningMotor.stopMotor();
+    }
     
     // --- Getters de Encoders para Odometría ---
 
@@ -79,7 +84,7 @@ public class SwerveIO {
     }
 
     /** @return La velocidad actual de la rueda en metros por segundo */
-    public double getDriveVelocityPerSecond() {
+    public double getDriveVelocityMetersPerSecond() {
         return driveEncoder.getVelocity();
     }
 
