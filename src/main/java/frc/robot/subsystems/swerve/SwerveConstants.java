@@ -7,6 +7,25 @@ package frc.robot.subsystems.swerve;
 /** Add your docs here. */
 public class SwerveConstants {
 
+// --------------------------------------------------------------------
+// IDs DE DISPOSITIVOS 
+// --------------------------------------------------------------------
+    
+    /** MODULO FR */
+    public static final int FR_PWR = 2;  
+    public static final int FR_TUR = 3;   
+
+    /** MODULO FL */
+    public static final int FL_PWR = 8;   
+    public static final int FL_TUR = 9;  
+
+    /** MODULO BR */
+    public static final int BR_PWR = 4;
+    public static final int BR_TUR = 5;
+
+    /** MODULO BL */
+    public static final int BL_PWR = 6; 
+    public static final int BL_TUR = 7;
 
 //-------------------------------------------------------------
 // GEOMETRÍA Y CONVERSIONES
@@ -46,6 +65,18 @@ public class SwerveConstants {
      */
     public static final double ROT_2_RAD =
             (2.0 * Math.PI) / STR_RATIO;
+    /** 
+     *  Distancia entre llantas laterales
+     * */    
+    public static final double WHEELS_BASE_METERS = 0.5;
+    
+    /**
+     *  Distancia entre llantas posteriores y anteriores
+     */
+    public static final double WHEELS_WIDTH_METERS = 0.5;
+    
+
+    public static final double MAX_SPEED_MPS = 4.5;
 
 
     // --------------------------------------------------------------------
@@ -97,6 +128,7 @@ public class SwerveConstants {
 
     /** kD: salida por unidad de error de velocidad (derivada). */
     public static final double POS_KD = 0.2;
+
 
     
     // --------------------------------------------------------------------
