@@ -78,6 +78,9 @@ public class SwerveConstants {
 
     public static final double MAX_SPEED_MPS = 4.5;
 
+    public static final double MAX_ANG_SPD = 11.34;
+
+
 
     // --------------------------------------------------------------------
     // GANANCIAS DE CONTROL - VELOCIDAD (DRIVE)
