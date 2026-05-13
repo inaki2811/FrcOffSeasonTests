@@ -39,14 +39,14 @@ public class SwerveConstants {
      * <p>
      * Vueltas de motor por cada vuelta de rueda.
      */
-    public static final double PWR_RATIO = 6.03;
+    public static final double PWR_RATIO = 8.14;
 
     /**
      * Relación de transmisión del motor de giro (steer).
      * <p>
      * Vueltas de motor por cada vuelta completa del módulo.
      */
-    public static final double STR_RATIO = 26.09;
+    public static final double STR_RATIO = 12.8;
 
     /**
      * Factor de conversión de rotaciones de motor de tracción a metros
@@ -68,17 +68,17 @@ public class SwerveConstants {
     /** 
      *  Distancia entre llantas laterales
      * */    
-    public static final double WHEELS_BASE_METERS = 0.5;
+    public static final double WHEELS_BASE_METERS = 0.48;
     
     /**
      *  Distancia entre llantas posteriores y anteriores
      */
-    public static final double WHEELS_WIDTH_METERS = 0.5;
+    public static final double WHEELS_WIDTH_METERS = 0.58;
     
 
-    public static final double MAX_SPEED_MPS = 4.5;
+    public static final double MAX_SPEED_MPS = 3.81;
 
-    public static final double MAX_ANG_SPD = 11.34;
+    public static final double MAX_ANG_SPD = 10;
 
 
 
@@ -87,35 +87,27 @@ public class SwerveConstants {
     // --------------------------------------------------------------------
 
     /** kS: salida para vencer fricción estática en el drive. */
-    public static final double VEL_KS = 0.16;
+    public static final double VEL_KS = 0;
 
     /** kV: salida por unidad de velocidad objetivo (output / rps). */
-    public static final double VEL_KV = 0.12;
+    public static final double VEL_KV = 0;
 
     /** kA: salida por unidad de aceleración objetivo (output / (rps/s)). */
-    public static final double VEL_KA = 0.003;
+    public static final double VEL_KA = 0;
 
     /** kP: salida por unidad de error de velocidad (output / rps). */
-    public static final double VEL_KP = 0.1;
+    public static final double VEL_KP = 0;
 
     /** kI: salida por unidad de error integrado de velocidad. */
     public static final double VEL_KI = 0;
 
     /** kD: salida por unidad de derivada del error de velocidad. */
-    public static final double VEL_KD = 0.025;
+    public static final double VEL_KD = 0;
 
     // --------------------------------------------------------------------
     // GANANCIAS DE CONTROL - POSICIÓN (STEER)
     // --------------------------------------------------------------------
 
-    /**
-     * kG: salida para compensar gravedad (en este caso, torque/rozamiento
-     * del módulo).
-     */
-    public static final double POS_KG = 0;
-
-    /** kS: salida para vencer fricción estática (offset inicial). */
-    public static final double POS_KS = 0.25;
 
     /** kV: salida por unidad de velocidad objetivo (output / rps). */
     public static final double POS_KV = 0.12;
@@ -124,13 +116,13 @@ public class SwerveConstants {
     public static final double POS_KA = 0.01;
 
     /** kP: salida por unidad de error de posición (output / rotación). */
-    public static final double POS_KP = 4.8;
+    public static final double POS_KP = 1;
 
     /** kI: salida por unidad de error integrado de posición. */
-    public static final double POS_KI = 0.0;
+    public static final double POS_KI = 0.01;
 
     /** kD: salida por unidad de error de velocidad (derivada). */
-    public static final double POS_KD = 0.2;
+    public static final double POS_KD = 0;
 
 
     
@@ -178,25 +170,25 @@ public class SwerveConstants {
     // --------------------------------------------------------------------
 
     /** Velocidad de crucero de Motion Magic para el steer (rot/s). */
-    public static final double MAGIC_MOTION_VELOCITY_STR = 100;
+    public static final double MAGIC_MOTION_VELOCITY_STR = 1000;
 
     /** Aceleración de Motion Magic para el steer (rot/s²). */
-    public static final double MAGIC_MOTION_ACCELERATION_STR = 1000;
+    public static final double MAGIC_MOTION_ACCELERATION_STR = 2000;
 
     /** Jerk de Motion Magic para el steer (rot/s³). */
-    public static final double MAGIC_MOTION_JERK_STR = 0;
+    public static final double MAGIC_MOTION_JERK_STR = 100;
 
     /**
      * Ganancia kV del modo Motion Magic Expo para el steer.
      * <p>
      * Escala la contribución de la velocidad en el perfil de movimiento.
      */
-    public static final double MAGIC_MOTION_EXPO_KV_STR = 0.12;
+    public static final double MAGIC_MOTION_EXPO_KV_STR = 0;
 
     /**
      * Ganancia kA del modo Motion Magic Expo para el steer.
      * <p>
      * Escala la contribución de la aceleración en el perfil de movimiento.
      */
-    public static final double MAGIC_MOTION_EXPO_KA_STR = 0.10;
+    public static final double MAGIC_MOTION_EXPO_KA_STR = 0;
 }

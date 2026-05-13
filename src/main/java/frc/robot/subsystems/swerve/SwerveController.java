@@ -113,8 +113,8 @@ public class SwerveController {
 
         // Configuración del encoder
                 
-        turningConfig.encoder.positionConversionFactor(2.0 * Math.PI);  // Salida en radianes
-        turningConfig.encoder.velocityConversionFactor((2.0 * Math.PI) / 60);
+        turningConfig.encoder.positionConversionFactor(SwerveConstants.ROT_2_RAD);  // Salida en radianes
+        turningConfig.encoder.velocityConversionFactor(SwerveConstants.ROT_2_RAD / 60);
         
 
         /** Aplicacion de las unidades PID */
