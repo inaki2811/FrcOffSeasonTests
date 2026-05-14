@@ -87,27 +87,30 @@ public class SwerveConstants {
     // --------------------------------------------------------------------
 
     /** kS: salida para vencer fricción estática en el drive. */
-    public static final double VEL_KS = 0;
+    public static final double VEL_KS = 0.16;
 
     /** kV: salida por unidad de velocidad objetivo (output / rps). */
-    public static final double VEL_KV = 0;
+    public static final double VEL_KV = 0.12;
 
     /** kA: salida por unidad de aceleración objetivo (output / (rps/s)). */
-    public static final double VEL_KA = 0;
+    public static final double VEL_KA = 0.003;
 
     /** kP: salida por unidad de error de velocidad (output / rps). */
-    public static final double VEL_KP = 0;
+    public static final double VEL_KP = 0.1;
 
     /** kI: salida por unidad de error integrado de velocidad. */
     public static final double VEL_KI = 0;
 
     /** kD: salida por unidad de derivada del error de velocidad. */
-    public static final double VEL_KD = 0;
+    public static final double VEL_KD = 0.025;
 
     // --------------------------------------------------------------------
     // GANANCIAS DE CONTROL - POSICIÓN (STEER)
     // --------------------------------------------------------------------
 
+
+    /** kS: salida para vencer fricción estática en el drive. */
+    public static final double POS_KS = 0.25;
 
     /** kV: salida por unidad de velocidad objetivo (output / rps). */
     public static final double POS_KV = 0.12;
@@ -116,13 +119,13 @@ public class SwerveConstants {
     public static final double POS_KA = 0.01;
 
     /** kP: salida por unidad de error de posición (output / rotación). */
-    public static final double POS_KP = 1;
+    public static final double POS_KP = 4.8;
 
     /** kI: salida por unidad de error integrado de posición. */
-    public static final double POS_KI = 0.01;
+    public static final double POS_KI = 0;
 
     /** kD: salida por unidad de error de velocidad (derivada). */
-    public static final double POS_KD = 0;
+    public static final double POS_KD = 0.2;
 
 
     

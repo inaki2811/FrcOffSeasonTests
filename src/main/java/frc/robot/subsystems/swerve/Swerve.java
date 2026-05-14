@@ -139,9 +139,9 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates,  SwerveConstants.MAX_SPEED_MPS);
   
     frontLeftModule.setDesiredState(desiredStates[0], isPathPlannerAttached);
-    frontRightModule.setDesiredState(desiredStates[1], isPathPlannerAttached);
-    backLeftModule.setDesiredState(desiredStates[2], isPathPlannerAttached);
-    backRightModule.setDesiredState(desiredStates[3], isPathPlannerAttached);
+    //frontRightModule.setDesiredState(desiredStates[1], isPathPlannerAttached);
+    //backLeftModule.setDesiredState(desiredStates[2], isPathPlannerAttached);
+    //backRightModule.setDesiredState(desiredStates[3], isPathPlannerAttached);
     
   }
 

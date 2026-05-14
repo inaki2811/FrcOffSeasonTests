@@ -75,7 +75,7 @@ public class SwerveController {
 
         /**  Comportamiento físico y protección eléctrica */
         driveConfig.idleMode(IdleMode.kBrake);  // Frena al recibir 0 en lugar de patinar
-        driveConfig.smartCurrentLimit(40);  // Establece el limite de corriente
+        driveConfig.smartCurrentLimit(30);  // Establece el limite de corriente
         driveConfig.voltageCompensation(12.0);  //Estandariza el comportamiento de la batería
 
         /** Conversión de unidades: 
@@ -91,7 +91,11 @@ public class SwerveController {
             SwerveConstants.VEL_KI,
             SwerveConstants.VEL_KD
             );
-        driveConfig.closedLoop.velocityFF(SwerveConstants.VEL_KV);
+
+
+        driveConfig.closedLoop.feedForward.kV(SwerveConstants.VEL_KV / SwerveConstants.ROT_2_M);
+        driveConfig.closedLoop.feedForward.kA(SwerveConstants.VEL_KA / SwerveConstants.ROT_2_M);
+        driveConfig.closedLoop.feedForward.kS(SwerveConstants.VEL_KS);
 
         /** Guarda la configuración en la memoria del Spark y se protege reinicios bruscos */
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -123,7 +127,11 @@ public class SwerveController {
             SwerveConstants.POS_KI, 
             SwerveConstants.POS_KD
             );
-        turningConfig.closedLoop.velocityFF(SwerveConstants.POS_KV);
+
+
+        turningConfig.closedLoop.feedForward.kV(SwerveConstants.POS_KV / SwerveConstants.ROT_2_M);
+        turningConfig.closedLoop.feedForward.kA(SwerveConstants.POS_KA / SwerveConstants.ROT_2_M);
+        turningConfig.closedLoop.feedForward.kS(SwerveConstants.POS_KS);
 
         /** Le indica al PID leer los datos del encoder */
         turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);   
@@ -148,8 +156,8 @@ public class SwerveController {
         //  Deadband de velocidad: A partir de cierto umbral ignora comandos
         if (Math.abs(velocityMps) > 0.1) {
 
-            drivePID.setSetpoint(velocityMps, ControlType.kVelocity, ClosedLoopSlot.kSlot0, 0.0);
-
+            driveMotor.set(velocityMps / SwerveConstants.MAX_SPEED_MPS);
+            
         } else {
 
             driveMotor.stopMotor();
@@ -170,11 +178,11 @@ public class SwerveController {
         if(Math.abs(angleRad - currentAngleRad) > Math.toRadians(1)){
 
             //  Usa MAXMotion para un movimiento fluido y rápido
-            turningPID.setSetpoint(angleRad, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, 0.0);    
+            turningPID.setSetpoint(angleRad, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0.0);    
 
         } else {
 
-            turningMotor.stopMotor(); 
+            turningMotor.stopMotor();
 
         }
         
