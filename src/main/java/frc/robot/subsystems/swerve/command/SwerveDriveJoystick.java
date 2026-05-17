@@ -16,8 +16,6 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SwerveDriveJoystick extends Command {
 
-    private static final double JOYSTICK_DEADZONE = 0.1 * SwerveConstants.MAX_SPEED_MPS;
-
   private final Swerve swerve;
 
   
@@ -28,16 +26,13 @@ public class SwerveDriveJoystick extends Command {
   private final Supplier<Double> zInput;
 
 
-  private final Supplier<Boolean> fieldRelative;
-
   /** Creates a new SwerveDriveJoystick. */
-  public SwerveDriveJoystick(Swerve swerve, Supplier<Double> xInput, Supplier<Double> yInput, Supplier<Double> zInput, Supplier<Boolean> fieldRelative) {
+  public SwerveDriveJoystick(Swerve swerve, Supplier<Double> xInput, Supplier<Double> yInput, Supplier<Double> zInput) {
     
     this.swerve = swerve;
     this.xInput = xInput;
     this.yInput = yInput;
     this.zInput = zInput;
-    this.fieldRelative = fieldRelative;
     
     addRequirements(swerve);
   }
@@ -46,27 +41,13 @@ public class SwerveDriveJoystick extends Command {
   @Override
   public void execute() {
 
-    double xSpeed = xInput.get() * SwerveConstants.MAX_SPEED_MPS;
-    double ySpeed = yInput.get() * SwerveConstants.MAX_SPEED_MPS;
-    double zSpeed = zInput.get() * SwerveConstants.MAX_ANG_SPD;
+    double xSpeed = processAxis(xInput, SwerveConstants.MAX_SPEED_MPS);
+    double ySpeed = processAxis(yInput, SwerveConstants.MAX_SPEED_MPS);  
+    double zSpeed = processAxis(zInput, SwerveConstants.MAX_ANG_SPD);
 
-    applyDeadband(xSpeed, JOYSTICK_DEADZONE);
-    applyDeadband(ySpeed, JOYSTICK_DEADZONE);
-    applyDeadband(zSpeed, JOYSTICK_DEADZONE);
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, zSpeed);
 
-    ChassisSpeeds chassisSpeeds;
-
-    if (fieldRelative.get()) {
-
-      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, zSpeed, swerve.geRotation2d());
-    
-    }else{
-
-      chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, zSpeed);
-    
-    }
-
-    swerve.drive(chassisSpeeds, false);
+    swerve.drive(chassisSpeeds);
 
 
   }
@@ -77,7 +58,11 @@ public class SwerveDriveJoystick extends Command {
     swerve.stopModules();
   }
 
-  private static double applyDeadband(double value, double deadzone) {
-    return Math.abs(value) > deadzone ? value : 0.0;
+  private static double processAxis (Supplier<Double> axisSupplier, double maxSpeed) {
+    double value = axisSupplier.get();
+
+    value = Math.abs(value) > 0.1 ? value : 0;
+
+    return value * maxSpeed;
   }
 }

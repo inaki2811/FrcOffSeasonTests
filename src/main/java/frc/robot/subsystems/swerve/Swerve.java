@@ -24,6 +24,7 @@ public class Swerve extends SubsystemBase {
     private final SwerveModule frontLeftModule =
       new SwerveModule(SwerveConstants.FL_PWR, SwerveConstants.FL_TUR);
 
+    /* 
     private final SwerveModule frontRightModule =
       new SwerveModule(SwerveConstants.FR_PWR, SwerveConstants.FR_TUR);
 
@@ -32,6 +33,7 @@ public class Swerve extends SubsystemBase {
 
     private final SwerveModule backRightModule =
       new SwerveModule(SwerveConstants.BR_PWR, SwerveConstants.BR_TUR);
+    */
 
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
       new Translation2d(SwerveConstants.WHEELS_BASE_METERS / 2.0, SwerveConstants.WHEELS_WIDTH_METERS / 2.0),
@@ -54,9 +56,9 @@ public class Swerve extends SubsystemBase {
  
     private SwerveModulePosition[] previouPositions = new SwerveModulePosition[]{
       frontLeftModule.getPosition(),
-      frontRightModule.getPosition(),
-      backLeftModule.getPosition(),
-      backRightModule.getPosition()
+      new SwerveModulePosition(0, new Rotation2d()),
+      new SwerveModulePosition(0, new Rotation2d()),
+      new SwerveModulePosition(0, new Rotation2d()),
     };
   
   public Swerve() {
@@ -66,15 +68,9 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SwerveModulePosition[] currentPositions = getSwerveModulePositions();
 
-
-    Twist2d twist = kinematics.toTwist2d(previouPositions, currentPositions);
-    robotPose = robotPose.exp(twist);
-    previouPositions = currentPositions;
 
     swervePublisher.set(getSwerveModuleStates());
-    SmartDashboard.putNumber("Robot Heading", getHeading());
 
   } 
 
@@ -82,23 +78,23 @@ public class Swerve extends SubsystemBase {
   public  SwerveModulePosition[] getSwerveModulePositions(){
       return new SwerveModulePosition[]{
         frontLeftModule.getPosition(),
-        frontRightModule.getPosition(),
-        backLeftModule.getPosition(),
-        backRightModule.getPosition()
+        new SwerveModulePosition(0.0, new Rotation2d()), // FANTASMA FR
+        new SwerveModulePosition(0.0, new Rotation2d()), // FANTASMA BL
+        new SwerveModulePosition(0.0, new Rotation2d())  // FANTASMA BR
       };
   }
 
   public SwerveModuleState[] getSwerveModuleStates (){
     return new SwerveModuleState[]{
       frontLeftModule.getState(),
-      frontRightModule.getState(),
-      backLeftModule.getState(),
-      backRightModule.getState()
+      new SwerveModuleState(0.0, new Rotation2d()), // FANTASMA FR
+      new SwerveModuleState(0.0, new Rotation2d()), // FANTASMA BL
+      new SwerveModuleState(0.0, new Rotation2d())  // FANTASMA BR
     };
   }
 
   public double getHeading(){
-    return robotPose.getRotation().getRadians();
+    return 0;
   }
 
   public Rotation2d geRotation2d(){
@@ -123,22 +119,19 @@ public class Swerve extends SubsystemBase {
 
   public void stopModules(){
     frontLeftModule.stop();
-    frontRightModule.stop();
-    backLeftModule.stop();
-    backRightModule.stop();
   }
 
-  public void drive(ChassisSpeeds speeds, boolean isPathPlannerAttached){
+  public void drive(ChassisSpeeds speeds){
     SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
 
-    setStates(moduleStates, isPathPlannerAttached);
+    setStates(moduleStates);
     swerveDesiredStatePublisher.set(moduleStates);
   }
 
-  public void setStates(SwerveModuleState[] desiredStates, boolean isPathPlannerAttached) {
+  public void setStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates,  SwerveConstants.MAX_SPEED_MPS);
   
-    frontLeftModule.setDesiredState(desiredStates[0], isPathPlannerAttached);
+    frontLeftModule.setDesiredState(desiredStates[0]);
     //frontRightModule.setDesiredState(desiredStates[1], isPathPlannerAttached);
     //backLeftModule.setDesiredState(desiredStates[2], isPathPlannerAttached);
     //backRightModule.setDesiredState(desiredStates[3], isPathPlannerAttached);

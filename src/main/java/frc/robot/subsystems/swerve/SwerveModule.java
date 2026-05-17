@@ -44,7 +44,7 @@ public class SwerveModule {
         io.stop();
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isPathPlannerAttached) {
+    public void setDesiredState(SwerveModuleState desiredState) {
         if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
             io.stop();
             return;
@@ -52,67 +52,24 @@ public class SwerveModule {
 
         Rotation2d encoderRotation = Rotation2d.fromRadians(io.getTurningEncoderRadians());
 
-        if (!isPathPlannerAttached) {
-            double desiredFinalVel = desiredState.speedMetersPerSecond;
-            double currentVel = Math.abs(io.getDriveVelocityMetersPerSecond());
-            double wantedDirection = desiredState.angle.getRadians();
-            
-            double wantedAcc = (desiredFinalVel - currentVel) / CONTROL_PERIOD_SEC;
 
-            double[] accLimits = accLimits(wantedAcc, wantedDirection, desiredFinalVel);
-            double limitedAcc = accLimits[0];
-            double limitedDirection = accLimits[1];
+        
+    
+        desiredState.optimize(encoderRotation);
+        controller.setVelocity(desiredState.speedMetersPerSecond);
+        controller.setAngle(desiredState.angle.getRadians());
 
-            double nextWantedVel = currentVel + (limitedAcc * CONTROL_PERIOD_SEC);
+        int moduleId = io.getDriveMotor().getDeviceId();
+        lastDebugTime = SwerveDebugUtil.publishModuleDebug(
+                moduleId, desiredState.speedMetersPerSecond, io.getDriveVelocityMetersPerSecond(), desiredState.speedMetersPerSecond,
+                0, 0, desiredState.angle.getRadians(), desiredState.angle.getRadians(),
+                lastDebugTime, DEBUG_UPDATE_INTERVAL_SEC
+        );
 
-            SwerveModuleState optimizeState = new SwerveModuleState(nextWantedVel, Rotation2d.fromRadians(limitedDirection));
-            optimizeState.optimize(encoderRotation);
 
-            controller.setVelocity(optimizeState.speedMetersPerSecond);
-            controller.setAngle(optimizeState.angle.getRadians());
-
-            int moduleId = io.getDriveMotor().getDeviceId();
-            lastDebugTime = SwerveDebugUtil.publishModuleDebug(
-                    moduleId, desiredFinalVel, currentVel, nextWantedVel,
-                    wantedAcc, limitedAcc, wantedDirection, limitedDirection,
-                    lastDebugTime, DEBUG_UPDATE_INTERVAL_SEC
-            );
-
-        } else {
-            desiredState.optimize(encoderRotation);
-            controller.setVelocity(desiredState.speedMetersPerSecond);
-            controller.setAngle(desiredState.angle.getRadians());
-        }
     }
 
-    private double[] accLimits(double wantedAcc, double wantedDirection, double desiredFinalVel) {
-        double wantedAccMagnitude = Math.abs(wantedAcc);
 
-        double maxForwardAccel = SwerveConstants.MAX_FORDWARD_ACCEL * (1.0 - (io.getDriveVelocityMetersPerSecond() / desiredFinalVel));
-        double forwardAccel = Math.min(wantedAccMagnitude, maxForwardAccel);
-        
-        double skidAccel = Math.min(wantedAccMagnitude, SwerveConstants.MAX_SKID_ACCEL);
-        double minAccel = Math.min(skidAccel, forwardAccel);
-        
-        double wantedSideAcc = minAccel * -Math.sin(wantedDirection);
-        double wantedFrontAcc = minAccel * Math.cos(wantedDirection);
 
-        double limitedFrontAcc = clamp(wantedFrontAcc, -SwerveConstants.MAX_FRONT_ACCEL, SwerveConstants.MAX_FRONT_ACCEL);
-        double limitedSideAcc = clamp(wantedSideAcc, -SwerveConstants.MAX_SIDE_ACCEL, SwerveConstants.MAX_SIDE_ACCEL);
 
-        double limitedAcc = Math.hypot(limitedFrontAcc, limitedSideAcc);
-        final double limitedDirection;
-        
-        if (Math.abs(limitedSideAcc) < SwerveConstants.MAX_SIDE_ACCEL && Math.abs(limitedFrontAcc) < SwerveConstants.MAX_FRONT_ACCEL) {
-            limitedDirection = wantedDirection;
-        } else {
-            limitedDirection = Math.atan2(-limitedSideAcc, limitedFrontAcc);
-        }
-
-        return new double[] { Math.copySign(limitedAcc, wantedAcc), limitedDirection };
-    }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(value, max));
-    }
 }

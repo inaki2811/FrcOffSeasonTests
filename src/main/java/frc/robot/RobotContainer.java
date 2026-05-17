@@ -23,8 +23,8 @@ public class RobotContainer {
             swerve,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX() ,
-            () -> true)
+            () -> -driverController.getRightX()
+            )
         );
 
 
