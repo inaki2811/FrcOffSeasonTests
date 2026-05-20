@@ -12,20 +12,20 @@ public class SwerveConstants {
 // --------------------------------------------------------------------
     
     /** MODULO FR */
-    public static final int FR_PWR = 2;  
-    public static final int FR_TUR = 3;   
+    public static final int FR_PWR = 3;  
+    public static final int FR_TUR = 7;   
 
     /** MODULO FL */
-    public static final int FL_PWR = 8;   
-    public static final int FL_TUR = 9;  
+    public static final int FL_PWR = 2;   
+    public static final int FL_TUR = 6;  
 
     /** MODULO BR */
-    public static final int BR_PWR = 4;
-    public static final int BR_TUR = 5;
+    public static final int BR_PWR = 8;
+    public static final int BR_TUR = 4;
 
     /** MODULO BL */
-    public static final int BL_PWR = 6; 
-    public static final int BL_TUR = 7;
+    public static final int BL_PWR = 9; 
+    public static final int BL_TUR = 5;
 
 //-------------------------------------------------------------
 // GEOMETRÍA Y CONVERSIONES

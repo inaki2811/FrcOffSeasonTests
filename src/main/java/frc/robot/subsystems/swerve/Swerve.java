@@ -27,10 +27,10 @@ public class Swerve extends SubsystemBase {
     /* 
     private final SwerveModule frontRightModule =
       new SwerveModule(SwerveConstants.FR_PWR, SwerveConstants.FR_TUR);
-
+    */
     private final SwerveModule backLeftModule =
       new SwerveModule(SwerveConstants.BL_PWR, SwerveConstants.BL_TUR);
-
+    /*
     private final SwerveModule backRightModule =
       new SwerveModule(SwerveConstants.BR_PWR, SwerveConstants.BR_TUR);
     */
@@ -57,7 +57,7 @@ public class Swerve extends SubsystemBase {
     private SwerveModulePosition[] previouPositions = new SwerveModulePosition[]{
       frontLeftModule.getPosition(),
       new SwerveModulePosition(0, new Rotation2d()),
-      new SwerveModulePosition(0, new Rotation2d()),
+      backLeftModule.getPosition(),
       new SwerveModulePosition(0, new Rotation2d()),
     };
   
@@ -79,7 +79,7 @@ public class Swerve extends SubsystemBase {
       return new SwerveModulePosition[]{
         frontLeftModule.getPosition(),
         new SwerveModulePosition(0.0, new Rotation2d()), // FANTASMA FR
-        new SwerveModulePosition(0.0, new Rotation2d()), // FANTASMA BL
+        backLeftModule.getPosition(),
         new SwerveModulePosition(0.0, new Rotation2d())  // FANTASMA BR
       };
   }
@@ -88,7 +88,7 @@ public class Swerve extends SubsystemBase {
     return new SwerveModuleState[]{
       frontLeftModule.getState(),
       new SwerveModuleState(0.0, new Rotation2d()), // FANTASMA FR
-      new SwerveModuleState(0.0, new Rotation2d()), // FANTASMA BL
+      backLeftModule.getState(),
       new SwerveModuleState(0.0, new Rotation2d())  // FANTASMA BR
     };
   }
@@ -133,7 +133,7 @@ public class Swerve extends SubsystemBase {
   
     frontLeftModule.setDesiredState(desiredStates[0]);
     //frontRightModule.setDesiredState(desiredStates[1], isPathPlannerAttached);
-    //backLeftModule.setDesiredState(desiredStates[2], isPathPlannerAttached);
+    backLeftModule.setDesiredState(desiredStates[2]);
     //backRightModule.setDesiredState(desiredStates[3], isPathPlannerAttached);
     
   }
