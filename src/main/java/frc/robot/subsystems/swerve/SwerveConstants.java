@@ -46,7 +46,7 @@ public class SwerveConstants {
      * <p>
      * Vueltas de motor por cada vuelta completa del módulo.
      */
-    public static final double STR_RATIO = 12.8;
+    public static final double STR_RATIO = 4.5;
 
     /**
      * Factor de conversión de rotaciones de motor de tracción a metros
@@ -119,15 +119,13 @@ public class SwerveConstants {
     public static final double POS_KA = 0.01;
 
     /** kP: salida por unidad de error de posición (output / rotación). */
-    public static final double POS_KP = 4.8;
+    public static final double POS_KP = 1;
 
     /** kI: salida por unidad de error integrado de posición. */
     public static final double POS_KI = 0;
 
     /** kD: salida por unidad de error de velocidad (derivada). */
-    public static final double POS_KD = 0.2;
-
-
+    public static final double POS_KD = 0;
     
     // --------------------------------------------------------------------
     // LIMITES DE ACELERACIÓN / ESTABILIDAD
