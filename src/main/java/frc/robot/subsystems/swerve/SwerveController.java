@@ -117,7 +117,7 @@ public class SwerveController {
 
         /** Position Wrapping: Optimiza y hace al módulo swerve ir por el camino más corto en un círculo (ej. de 359° a 1°) */
         turningConfig.closedLoop.positionWrappingEnabled(true);
-        turningConfig.closedLoop.positionWrappingInputRange(0.0, 2.0 * Math.PI);
+        turningConfig.closedLoop.positionWrappingInputRange(-Math.PI,  Math.PI);
 
         /** Guarda la configuración en la memoria del Spark y se protege reinicios bruscos */
         turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

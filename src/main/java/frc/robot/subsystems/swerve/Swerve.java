@@ -20,11 +20,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Swerve extends SubsystemBase {
 
 
-
+     
     private final SwerveModule frontLeftModule =
       new SwerveModule(SwerveConstants.FL_PWR, SwerveConstants.FL_TUR);
 
-    /* 
+    
     private final SwerveModule frontRightModule =
       new SwerveModule(SwerveConstants.FR_PWR, SwerveConstants.FR_TUR);
     
@@ -33,7 +33,7 @@ public class Swerve extends SubsystemBase {
   
     private final SwerveModule backRightModule =
       new SwerveModule(SwerveConstants.BR_PWR, SwerveConstants.BR_TUR);
-    */
+    
 
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
       new Translation2d(SwerveConstants.WHEELS_BASE_METERS / 2.0, SwerveConstants.WHEELS_WIDTH_METERS / 2.0),
@@ -56,9 +56,11 @@ public class Swerve extends SubsystemBase {
  
     private SwerveModulePosition[] previouPositions = new SwerveModulePosition[]{
       frontLeftModule.getPosition(),
-      new SwerveModulePosition(0, new Rotation2d()),
-      new SwerveModulePosition(0, new Rotation2d()),
-      new SwerveModulePosition(0, new Rotation2d()),
+      frontRightModule.getPosition(),
+      backLeftModule.getPosition(),
+      backRightModule.getPosition()
+
+
     };
   
   public Swerve() {
@@ -78,19 +80,23 @@ public class Swerve extends SubsystemBase {
   public  SwerveModulePosition[] getSwerveModulePositions(){
       return new SwerveModulePosition[]{
         frontLeftModule.getPosition(),
-        new SwerveModulePosition(0.0, new Rotation2d()), // FANTASMA FR
-        new SwerveModulePosition(0.0, new Rotation2d()), // FANTASMA FR
-        new SwerveModulePosition(0.0, new Rotation2d())  // FANTASMA BR
+        frontRightModule.getPosition(),
+        backLeftModule.getPosition(),
+        backRightModule.getPosition(),
+      
+ 
       };
   }
 
   public SwerveModuleState[] getSwerveModuleStates (){
     return new SwerveModuleState[]{
       frontLeftModule.getState(),
-      new SwerveModuleState(0.0, new Rotation2d()), // FANTASMA FR
-      new SwerveModuleState(0.0, new Rotation2d()), // FANTASMA FR
-      new SwerveModuleState(0.0, new Rotation2d())  // FANTASMA BR
+      frontRightModule.getState(),
+      backLeftModule.getState(),
+      backRightModule.getState(),
     };
+
+
   }
 
   public double getHeading(){
@@ -119,6 +125,9 @@ public class Swerve extends SubsystemBase {
 
   public void stopModules(){
     frontLeftModule.stop();
+    frontRightModule.stop();
+    backLeftModule.stop();
+    backRightModule.stop();
   }
 
   public void drive(ChassisSpeeds speeds){
@@ -132,9 +141,9 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates,  SwerveConstants.MAX_SPEED_MPS);
   
     frontLeftModule.setDesiredState(desiredStates[0]);
-    //frontRightModule.setDesiredState(desiredStates[1], isPathPlannerAttached);
-    //backLeftModule.setDesiredState(desiredStates[2]);
-    //backRightModule.setDesiredState(desiredStates[3], isPathPlannerAttached);
+    frontRightModule.setDesiredState(desiredStates[1]);
+    backLeftModule.setDesiredState(desiredStates[2]);
+    backRightModule.setDesiredState(desiredStates[3]);
     
   }
 

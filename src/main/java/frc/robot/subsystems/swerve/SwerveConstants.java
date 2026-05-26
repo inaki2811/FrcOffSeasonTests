@@ -12,20 +12,19 @@ public class SwerveConstants {
 // --------------------------------------------------------------------
     
     /** MODULO FR */
-    public static final int FR_PWR = 3;  
-    public static final int FR_TUR = 7;   
-
+    public static final int FR_PWR = 4; //4 
+    public static final int FR_TUR = 5; //5 
     /** MODULO FL */
     public static final int FL_PWR = 2;   
-    public static final int FL_TUR = 6;  
+    public static final int FL_TUR = 3;  
 
     /** MODULO BR */
-    public static final int BR_PWR = 8;
-    public static final int BR_TUR = 4;
+    public static final int BR_PWR = 9; //9
+    public static final int BR_TUR = 8; //8
 
     /** MODULO BL */
-    public static final int BL_PWR = 9; 
-    public static final int BL_TUR = 5;
+    public static final int BL_PWR = 7; //7
+    public static final int BL_TUR = 6; //6
 
 //-------------------------------------------------------------
 // GEOMETRÍA Y CONVERSIONES
@@ -46,7 +45,10 @@ public class SwerveConstants {
      * <p>
      * Vueltas de motor por cada vuelta completa del módulo.
      */
-    public static final double STR_RATIO = 4.5;
+    public static final double STR_RATIO = 12.8;
+
+    //4.5 para el que esta dañado el encoder
+    //8.14 para el que no
 
     /**
      * Factor de conversión de rotaciones de motor de tracción a metros
@@ -145,7 +147,7 @@ public class SwerveConstants {
      * <p>
      * Se usa solo para derivar la aceleración lateral máxima por skid.
      */
-    private static final double FRICTION_COF = 2.255;
+    private static final double FRICTION_COF = 0.978;
 
     /**
      * Aceleración máxima antes de patinar (skid) en m/s².
