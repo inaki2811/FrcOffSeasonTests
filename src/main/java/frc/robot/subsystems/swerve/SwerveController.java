@@ -11,6 +11,7 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -74,6 +75,12 @@ public class SwerveController {
     private void configureDriveMotors() {
         SparkMaxConfig driveConfig = new SparkMaxConfig();
 
+
+        /**  Comportamiento físico y protección eléctrica */
+        driveConfig.idleMode(IdleMode.kBrake);  // Frena al recibir 0 en lugar de patinar
+
+        driveConfig.voltageCompensation(12.0);  //Estandariza el comportamiento de la batería
+
         /**  Comportamiento físico y protección eléctrica */
         driveConfig.smartCurrentLimit(30);  // Establece el limite de corriente
 
@@ -81,6 +88,16 @@ public class SwerveController {
          *  De: Unidades internas del motor
          *  A: Metros 
         */
+
+        driveConfig.closedLoop.pid(SwerveConstants.VEL_KP, SwerveConstants.VEL_KI, SwerveConstants.VEL_KD);
+
+        driveConfig.closedLoop.feedForward.kS(SwerveConstants.VEL_KS);
+
+        driveConfig.closedLoop.feedForward.kV(SwerveConstants.VEL_KV);
+
+        driveConfig.closedLoop.feedForward.kA(SwerveConstants.VEL_KA);
+
+        driveConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);   
 
         driveConfig.encoder.positionConversionFactor(SwerveConstants.ROT_2_M);
         driveConfig.encoder.velocityConversionFactor(SwerveConstants.ROT_2_M / 60);
@@ -101,6 +118,10 @@ public class SwerveController {
         
         /**  Comportamiento físico y protección eléctrica */
         turningConfig.idleMode(IdleMode.kBrake);
+
+        turningConfig.voltageCompensation(12.0);  //Estandariza el comportamiento de la batería
+
+
         turningConfig.smartCurrentLimit(30);    // Establece el limite de corriente
 
         // Configuración del encoder
@@ -110,7 +131,12 @@ public class SwerveController {
 
 
         turningConfig.closedLoop.pid(SwerveConstants.POS_KP, SwerveConstants.POS_KI, SwerveConstants.POS_KD);
-        
+         
+        turningConfig.closedLoop.feedForward.kS(SwerveConstants.POS_KS);
+
+        turningConfig.closedLoop.feedForward.kV(SwerveConstants.POS_KV);
+
+        turningConfig.closedLoop.feedForward.kA(SwerveConstants.POS_KA);
 
         /** Le indica al PID leer los datos del encoder */
         turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);   
@@ -129,15 +155,9 @@ public class SwerveController {
      */
     public void setVelocity (double velocityMps) {
         //  Deadband de velocidad: A partir de cierto umbral ignora comandos
-        if (Math.abs(velocityMps) > 0.1) {
+       
+        drivePID.setSetpoint(velocityMps , ControlType.kVelocity ,ClosedLoopSlot.kSlot0, 0.0);
 
-            drivePID.setSetpoint((velocityMps / SwerveConstants.MAX_SPEED_MPS), ControlType.kDutyCycle ,ClosedLoopSlot.kSlot0, 0.0);
-            
-        } else {
-
-            driveMotor.stopMotor();
-
-        }
     }
 
     /**
