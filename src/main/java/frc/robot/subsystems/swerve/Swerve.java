@@ -140,12 +140,21 @@ public class Swerve extends SubsystemBase {
   public void setStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates,  SwerveConstants.MAX_SPEED_MPS);
   
-    frontLeftModule.setDesiredState(desiredStates[0]);
-    frontRightModule.setDesiredState(desiredStates[1]);
+    //frontLeftModule.setDesiredState(desiredStates[0]);
+    //frontRightModule.setDesiredState(desiredStates[1]);
     backLeftModule.setDesiredState(desiredStates[2]);
-    backRightModule.setDesiredState(desiredStates[3]);
+    //backRightModule.setDesiredState(desiredStates[3]);
     
   }
 
+  public void setStatesDirectoSinFiltros(SwerveModuleState[] desiredStates) {
+    
+    //frontLeftModule.setDesiredState(desiredStates[0]);
+    //frontRightModule.setDesiredState(desiredStates[1]);
+    backLeftModule.setDesiredState(desiredStates[2]);
+    //backRightModule.setDesiredState(desiredStates[3]);
+    
+    swerveDesiredStatePublisher.set(desiredStates);
+  }
 
 }

@@ -16,7 +16,7 @@ public class SwerveModule {
     private final SwerveController controller;
     private final SwerveIO io;
     private static final double CONTROL_PERIOD_SEC = 0.02;
-    private static final double DEBUG_UPDATE_INTERVAL_SEC = 1.0;
+    private static final double DEBUG_UPDATE_INTERVAL_SEC = 0.02;
     private double lastDebugTime = 0.0;
 
     public SwerveModule(int driveSparkID, int turningSparkID) {
@@ -55,7 +55,7 @@ public class SwerveModule {
 
         
     
-        desiredState.optimize(encoderRotation);
+        //desiredState.optimize(encoderRotation);
         controller.setVelocity(desiredState.speedMetersPerSecond);
         controller.setAngle(desiredState.angle.getRadians());
 
