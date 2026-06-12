@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,6 +22,7 @@ public class Swerve extends SubsystemBase {
 
     private PoseTracker poseTracker;
 
+    private final Field2d field = new Field2d();
      
     private final SwerveModule frontLeftModule =
       new SwerveModule(SwerveConstants.FL_PWR, SwerveConstants.FL_TUR);
@@ -66,8 +68,11 @@ public class Swerve extends SubsystemBase {
     poseTracker.update(getSwerveModulePositions());
     robotPose = poseTracker.getPose2d();
 
-    SmartDashboard.putString("Position : ", robotPose.toString());
-    SmartDashboard.putNumber("Heading Robot : ", robotPose.getRotation().getDegrees());
+    SmartDashboard.putNumber("Robot Position X meters: ", robotPose.getX());
+    SmartDashboard.putNumber("Robot Position Y meters: ", robotPose.getY());
+    SmartDashboard.putNumber("Heading Degrees: ", robotPose.getRotation().getDegrees());
+
+    field.setRobotPose(robotPose);
 
     swervePublisher.set(getSwerveModuleStates());
 
