@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
 
+    private PoseTracker poseTracker;
 
      
     private final SwerveModule frontLeftModule =
@@ -53,24 +54,20 @@ public class Swerve extends SubsystemBase {
                     .publish();
 
     private Pose2d robotPose = new Pose2d();
- 
-    private SwerveModulePosition[] previouPositions = new SwerveModulePosition[]{
-      frontLeftModule.getPosition(),
-      frontRightModule.getPosition(),
-      backLeftModule.getPosition(),
-      backRightModule.getPosition()
 
-
-    };
   
   public Swerve() {
-    
+    poseTracker = new PoseTracker(getSwerveModulePositions(), kinematics);
   }
 
 
   @Override
   public void periodic() {
+    poseTracker.update(getSwerveModulePositions());
+    robotPose = poseTracker.getPose2d();
 
+    SmartDashboard.putString("Position : ", robotPose.toString());
+    SmartDashboard.putNumber("Heading Robot : ", robotPose.getRotation().getDegrees());
 
     swervePublisher.set(getSwerveModuleStates());
 
@@ -100,10 +97,10 @@ public class Swerve extends SubsystemBase {
   }
 
   public double getHeading(){
-    return 0;
+    return robotPose.getRotation().getDegrees();
   }
 
-  public Rotation2d geRotation2d(){
+  public Rotation2d getRotation2d(){
     return robotPose.getRotation();
   }
 
@@ -140,21 +137,13 @@ public class Swerve extends SubsystemBase {
   public void setStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates,  SwerveConstants.MAX_SPEED_MPS);
   
-    //frontLeftModule.setDesiredState(desiredStates[0]);
-    //frontRightModule.setDesiredState(desiredStates[1]);
+    frontLeftModule.setDesiredState(desiredStates[0]);
+    frontRightModule.setDesiredState(desiredStates[1]);
     backLeftModule.setDesiredState(desiredStates[2]);
-    //backRightModule.setDesiredState(desiredStates[3]);
+    backRightModule.setDesiredState(desiredStates[3]);
     
   }
 
-  public void setStatesDirectoSinFiltros(SwerveModuleState[] desiredStates) {
-    
-    //frontLeftModule.setDesiredState(desiredStates[0]);
-    //frontRightModule.setDesiredState(desiredStates[1]);
-    backLeftModule.setDesiredState(desiredStates[2]);
-    //backRightModule.setDesiredState(desiredStates[3]);
-    
-    swerveDesiredStatePublisher.set(desiredStates);
-  }
+
 
 }
