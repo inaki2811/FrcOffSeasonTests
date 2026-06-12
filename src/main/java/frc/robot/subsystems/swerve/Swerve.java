@@ -21,8 +21,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Swerve extends SubsystemBase {
 
     private PoseTracker poseTracker;
-
-    private final Field2d field = new Field2d();
      
     private final SwerveModule frontLeftModule =
       new SwerveModule(SwerveConstants.FL_PWR, SwerveConstants.FL_TUR);
@@ -60,6 +58,7 @@ public class Swerve extends SubsystemBase {
   
   public Swerve() {
     poseTracker = new PoseTracker(getSwerveModulePositions(), kinematics);
+
   }
 
 
@@ -67,12 +66,6 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     poseTracker.update(getSwerveModulePositions());
     robotPose = poseTracker.getPose2d();
-
-    SmartDashboard.putNumber("Robot Position X meters: ", robotPose.getX());
-    SmartDashboard.putNumber("Robot Position Y meters: ", robotPose.getY());
-    SmartDashboard.putNumber("Heading Degrees: ", robotPose.getRotation().getDegrees());
-
-    field.setRobotPose(robotPose);
 
     swervePublisher.set(getSwerveModuleStates());
 

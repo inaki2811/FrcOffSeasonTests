@@ -12,6 +12,9 @@ import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class PoseTracker {
@@ -22,6 +25,10 @@ private SwerveModulePosition[] previousPositions;
 
 private final SwerveDriveKinematics swerveKinematics;
 
+private final StructPublisher<Pose2d> posePublisher = 
+            NetworkTableInstance.getDefault()
+                    .getStructTopic("RobotPoseStruct", Pose2d.struct)
+                    .publish();
 
 public PoseTracker(SwerveModulePosition[] previousPositions, SwerveDriveKinematics swerveDriveKinematics){
     this.pose2d = new Pose2d(); 
@@ -36,6 +43,12 @@ public void update(SwerveModulePosition[] currentPosition){
     pose2d = pose2d.exp(twist);
     
     previousPositions = currentPosition;
+
+    posePublisher.set(pose2d);
+        
+    SmartDashboard.putNumber("Robot Position X meters: ", pose2d.getX());
+    SmartDashboard.putNumber("Robot Position Y meters: ", pose2d.getY());
+    SmartDashboard.putNumber("Robot Heading Degrees: ", pose2d.getRotation().getDegrees());
 
 }
 
