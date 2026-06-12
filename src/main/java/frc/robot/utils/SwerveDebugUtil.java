@@ -37,16 +37,14 @@ public class SwerveDebugUtil {
         SmartDashboard.putNumber("Wanted Acc" + moduleId, wantedAcc);
         SmartDashboard.putNumber("Limited Acc" + moduleId, limitedAcc);
 
-        SmartDashboard.putNumber("Wanted Side Acc" + moduleId, wantedAcc * Math.cos(wantedDirection));
-        SmartDashboard.putNumber("Wanted Front Acc"+ moduleId, wantedAcc * Math.sin(wantedDirection));
+        SmartDashboard.putNumber("Wanted Front Acc " + moduleId, wantedAcc * Math.cos(wantedDirection));
+        SmartDashboard.putNumber("Wanted Side Acc " + moduleId, wantedAcc * -Math.sin(wantedDirection));
 
-        SmartDashboard.putNumber("Limited Side Acc " + moduleId, limitedAcc * Math.cos(limitedDirection));
-        SmartDashboard.putNumber("Limited Front Acc " + moduleId, limitedAcc * Math.sin(limitedDirection));
-
+        SmartDashboard.putNumber("Limited Front Acc " + moduleId, limitedAcc * Math.cos(limitedDirection));
+        SmartDashboard.putNumber("Limited Side Acc " + moduleId, limitedAcc * -Math.sin(limitedDirection));
         
         SmartDashboard.putNumber("Wanted Direction " + moduleId, wantedDirection);
         SmartDashboard.putNumber("Limited Direction " + moduleId, limitedDirection);
-
         
         SmartDashboard.putNumber("Desired Final Vel " + moduleId, desiredFinalVel);
         SmartDashboard.putNumber("Current Vel " + moduleId, currentVel);
@@ -54,7 +52,4 @@ public class SwerveDebugUtil {
 
         return lastDebugTime;
     }
-
-
-
 }

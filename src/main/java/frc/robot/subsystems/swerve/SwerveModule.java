@@ -45,31 +45,67 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
-        if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
-            io.stop();
-            return;
-        }
 
         Rotation2d encoderRotation = Rotation2d.fromRadians(io.getTurningEncoderRadians());
 
+        double desiredFinalVel = desiredState.speedMetersPerSecond;
 
+        double currentVel = Math.abs(io.getDriveVelocityMetersPerSecond());
+
+        double wantedAcc = (desiredFinalVel - currentVel)  / CONTROL_PERIOD_SEC;
+
+        double wantedDirection = desiredState.angle.getRadians();
+
+        double wantedFrontAcc = wantedAcc * Math.cos(wantedDirection);
+
+        double wantedSideAcc = wantedAcc * -Math.sin(wantedDirection);
         
-    
-        //desiredState.optimize(encoderRotation);
-        controller.setVelocity(desiredState.speedMetersPerSecond);
-        controller.setAngle(desiredState.angle.getRadians());
+        double limitedFrontAcc = clamp(wantedFrontAcc, -SwerveConstants.MAX_FRONT_ACCEL, SwerveConstants.MAX_FRONT_ACCEL);
+
+        double limitedSideAcc = clamp(wantedSideAcc, -SwerveConstants.MAX_SIDE_ACCEL, SwerveConstants.MAX_SIDE_ACCEL);
+
+        double limitedAccMagnitude = Math.hypot(limitedFrontAcc, limitedSideAcc);
+
+        double limitedAcc = Math.copySign(limitedAccMagnitude, wantedAcc);
+
+        double limitedDirection = Math.atan2(-limitedSideAcc, limitedFrontAcc);
+
+        double nextWantedVel = currentVel + (limitedAcc * CONTROL_PERIOD_SEC);
+
+
+        SwerveModuleState limitedState = new SwerveModuleState(nextWantedVel, Rotation2d.fromRadians(limitedDirection));
+
+        limitedState.optimize(encoderRotation);
+
+        if (Math.abs(desiredState.speedMetersPerSecond) < 0.001 ) {
+            io.stop();
+        } else {
+
+            double cosineScalar = limitedState.angle.minus(encoderRotation).getCos();
+            
+            controller.setVelocity(limitedState.speedMetersPerSecond * cosineScalar);
+            controller.setAngle(limitedState.angle.getRadians());
+        }
+        
 
         int moduleId = io.getDriveMotor().getDeviceId();
         lastDebugTime = SwerveDebugUtil.publishModuleDebug(
-                moduleId, desiredState.speedMetersPerSecond, io.getDriveVelocityMetersPerSecond(), desiredState.speedMetersPerSecond,
-                0, 0, desiredState.angle.getRadians(), desiredState.angle.getRadians(),
+                moduleId, 
+                desiredState.speedMetersPerSecond, 
+                io.getDriveVelocityMetersPerSecond(), 
+                nextWantedVel, 
+                wantedAcc, limitedAcc, 
+                wantedDirection, limitedDirection, 
                 lastDebugTime, DEBUG_UPDATE_INTERVAL_SEC
         );
 
 
+    
     }
 
-
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(value, max));
+    }
 
 
 }

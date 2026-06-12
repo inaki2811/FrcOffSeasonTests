@@ -47,9 +47,6 @@ public class SwerveConstants {
      */
     public static final double STR_RATIO = 12.8;
 
-    //4.5 para el que esta dañado el encoder
-    //8.14 para el que no
-
     /**
      * Factor de conversión de rotaciones de motor de tracción a metros
      * recorridos por el módulo.

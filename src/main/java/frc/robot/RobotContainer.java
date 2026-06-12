@@ -33,47 +33,6 @@ public class RobotContainer {
             )
         );
             
-        new JoystickButton(driverController, XboxController.Button.kA.value)
-            .whileTrue(
-                new RunCommand(() -> {
-
-                    double time = Timer.getFPGATimestamp();
-                    double amplitud = 3.8;
-                    double frecuencia = 3.0; 
-                    double velocidadSenoidal = amplitud * Math.sin(time * frecuencia);
-
-                    SwerveModuleState estadoForzado = new SwerveModuleState(velocidadSenoidal, new Rotation2d(0));
-                    swerve.setStatesDirectoSinFiltros(new SwerveModuleState[] {
-                        estadoForzado, estadoForzado, estadoForzado, estadoForzado
-                    });
-                },
-                swerve)
-            );
-
-        new JoystickButton(driverController, XboxController.Button.kB.value)
-            .whileTrue(
-                new RunCommand(() -> {
-
-                    double amplitud = 3.8; 
-
-                    double frecuencia = 0.5; 
-            
-                    double tiempoModulo = (Timer.getFPGATimestamp() * frecuencia) % 2.0;
-                    double velocidadCuadrada = 0.0;
-
-                    if (tiempoModulo < 1.0) {
-                        velocidadCuadrada = amplitud; 
-                    } else {
-                        velocidadCuadrada = -amplitud; 
-                    }
-
-                    SwerveModuleState estadoForzado = new SwerveModuleState(velocidadCuadrada, new Rotation2d(0));
-                    swerve.setStatesDirectoSinFiltros(new SwerveModuleState[] {
-                        estadoForzado, estadoForzado, estadoForzado, estadoForzado
-                    });
-                },
-                swerve)
-            );
     }
 
 
