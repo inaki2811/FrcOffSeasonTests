@@ -86,22 +86,22 @@ public class SwerveConstants {
     // --------------------------------------------------------------------
 
     /** kS: salida para vencer fricción estática en el drive. */
-    public static final double VEL_KS = 0.16;
+    public static final double VEL_KS = 0.13;
 
     /** kV: salida por unidad de velocidad objetivo (output / rps). */
-    public static final double VEL_KV = 0.12;
+    public static final double VEL_KV = 2.8;
 
     /** kA: salida por unidad de aceleración objetivo (output / (rps/s)). */
-    public static final double VEL_KA = 0.003;
+    public static final double VEL_KA = 0.28;
 
     /** kP: salida por unidad de error de velocidad (output / rps). */
-    public static final double VEL_KP = 0.1;
+    public static final double VEL_KP = 0.45;
 
     /** kI: salida por unidad de error integrado de velocidad. */
     public static final double VEL_KI = 0;
 
     /** kD: salida por unidad de derivada del error de velocidad. */
-    public static final double VEL_KD = 0.025;
+    public static final double VEL_KD = 0.04;
 
     // --------------------------------------------------------------------
     // GANANCIAS DE CONTROL - POSICIÓN (STEER)
